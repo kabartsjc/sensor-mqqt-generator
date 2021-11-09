@@ -1,6 +1,4 @@
 {
-	"mqqtTopic": "sensors/moscatest",
 	"mqqtBrokerAddr": "tcp://127.0.0.1:1883",
-	"username": "teste",
-	"password":"teste"
+	"qos": "0"
 }

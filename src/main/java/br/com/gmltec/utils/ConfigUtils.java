@@ -13,65 +13,69 @@ import org.json.simple.parser.ParseException;
 import br.com.gmltec.sensor.Sensor;
 
 public class ConfigUtils {
-	private String mqqtTopic;
-	private String mqqtBrokerAddr;
-	private String username;
-	private String password;
 	
-	private List<Sensor> sensorL;
-	
-	public ConfigUtils() {
-		parse();
-	}
-	
-	private void parse() {
+	public static List<Sensor> parseConfigFiles() {
 		System.out.println("parsing basic config.json");
-		parseConfig();
+		String params [] = parseConfig();
 		System.out.println("parsing basic sensors.json");
-		parseSensorFiles();
+		List<Sensor>sensorL = parseSensorFiles(params);
+		return sensorL;
 	}
 	
-	private void parseConfig() {
+	private static String[] parseConfig() {
 		String exeFile = "resources/config.json";
+		String qos=null;
+		String mqqtBrokerAddr=null;
+		
 		try {
 			Object obj = new JSONParser().parse(new FileReader(exeFile));
 			JSONObject jo = (JSONObject) obj;
-			mqqtTopic = (String) jo.get("mqqtTopic");
-			mqqtBrokerAddr = (String) jo.get("mqqtBrokerAddr");
-			username = (String) jo.get("username");
-			password = (String) jo.get("password");
-			
+			mqqtBrokerAddr = (String) jo.get("mqqtBrokerAddr");	
+			qos =  (String) jo.get("qos");	
 		} catch (IOException | ParseException e) {
 			e.printStackTrace();
 		}
+		
+		String[] obj = new String[3];
+		obj[0]=mqqtBrokerAddr;
+		obj[1]=qos;
+		
+		return obj;
 	}
 	
 	
-	private void parseSensorFiles() {
+	private static List<Sensor> parseSensorFiles(String params[]) {
 		String sensorFile = "resources/sensors.json";
-		sensorL = new ArrayList<>();
+		List<Sensor> sensorL = new ArrayList<>();
+		
+		String mqqtBrokerAddr=params[0];
+		int qos=Integer.parseInt(params[1]);
 		
 		try {
 			Object obj = new JSONParser().parse(new FileReader(sensorFile));
 			JSONArray joArr = (JSONArray) obj;
 			for (int i = 0; i < joArr.size(); i++) {
 				JSONObject jo = (JSONObject) joArr.get(i);
+				String productKey = (String) jo.get("productKey");
+				String deviceSecret = (String) jo.get("deviceSecret");
+				
 				String sensorID = (String) jo.get("sensorID");
 				double latitude = (double) jo.get("latitude");
 				double longitude = (double) jo.get("longitude");
+				int update_rate_ms= Integer.parseInt((String) jo.get("update_rate_ms"));
 				double mean=(double) jo.get("mean");
 				double stdv=(double) jo.get("stdv");
-				Sensor sensor = new Sensor(sensorID, mqqtTopic, mqqtBrokerAddr, username, password, latitude, longitude, mean, stdv);
+				String mqqtTopic = (String) jo.get("mqqtTopic");
+				
+				Sensor sensor = new Sensor(productKey,deviceSecret,sensorID, mqqtTopic, mqqtBrokerAddr,
+						qos,update_rate_ms,
+						latitude, longitude, mean, stdv);
 				sensorL.add(sensor);
 			}
 		} catch (IOException | ParseException e) {
 			e.printStackTrace();
 		}
-	}
-
-	public List<Sensor> getSensorL() {
+		
 		return sensorL;
 	}
-	
-
 }

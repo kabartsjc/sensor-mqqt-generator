@@ -2,42 +2,55 @@ package br.com.gmltec.sensor;
 
 import java.text.SimpleDateFormat;
 
-import br.com.gmltec.gen.RandomGen;
-import br.com.gmltec.mqqt.ClientMQTT;
+import org.eclipse.paho.client.mqttv3.IMqttToken;
 
-public class Sensor {
+import br.com.gmltec.gen.RandomGen;
+import br.com.gmltec.mqqt.MQTTV3Client;
+import br.com.gmltec.mqqt.Mqtt3PostPropertyMessageListener;
+import br.com.gmltec.mqqt.MqttSign;
+
+
+public class Sensor implements Runnable {
 	private String sensorID;
 	private double latitude;
 	private double longitude;
-	private ClientMQTT clientMQTT;
-	
+
+	private MQTTV3Client clientMQTT;
+	private MqttSign sign;
+
 	private String mqqtTopic;
+	
+	private int update_rate_ms;
 	
 	private RandomGen random;
 	
-	public Sensor(String sensorID, 
-			String mqqtTopic, String mqqtBrokerAddr, 
-			String username, String password,
+	private boolean running=true;
+	
+	public Sensor(String productKey, String deviceSecret, String sensorID, 
+			String mqqtTopic, String mqqtBrokerAddr, int qos,int update_rate_ms,
 			double latitude, double longitude, double mean, double stdv) {
 		super();
+		
+		sign = new MqttSign();
+        sign.calculate(productKey, sensorID, deviceSecret);
+        
 		this.sensorID = sensorID;
 		this.mqqtTopic=mqqtTopic;
 		this.latitude = latitude;
 		this.longitude = longitude;
 		random = new RandomGen(mean, stdv);
-		clientMQTT = new ClientMQTT(mqqtBrokerAddr, username, password);
-		clientMQTT.start(sensorID);
+		
+		this.update_rate_ms=update_rate_ms;
+		
+		clientMQTT = new MQTTV3Client(mqqtBrokerAddr, sign);
+		
+		IMqttToken subscribe = clientMQTT.subscribe(qos,  new Mqtt3PostPropertyMessageListener(), mqqtTopic);
+		if (subscribe==null) {
+			return;
+		}
 	}
 
-	public String getSensorID() {
-		return sensorID;
-	}
-
-	public String getMqqtTopic() {
-		return mqqtTopic;
-	}
-	
-	private String update() {
+	private String prepareMessage() {
 		String msg = null;
 		String time = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(System.currentTimeMillis());
 		String measure = Double.toString(random.nextSample());
@@ -46,8 +59,33 @@ public class Sensor {
 	}
 	
 	
-	public void publish() {
-		String msg = update();
+	private void publish() {
+		String msg = prepareMessage();
 		clientMQTT.publish(mqqtTopic, msg.getBytes(), 0);
+	}
+	
+	
+	private void close() {
+		clientMQTT.unsubscribe(mqqtTopic);
+		clientMQTT.end();
+	}
+	
+	@Override
+	public void run() {
+		
+		while(running) {
+			try {
+				this.publish();
+				Thread.sleep(this.update_rate_ms);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		this.close();
+	}
+	
+	public void finish() {
+		this.running=false;
 	}
 }

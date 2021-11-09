@@ -11,32 +11,34 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MqttDefaultFilePersistence;
 
-public class ClientMQTT implements MqttCallbackExtended {
+public class MQTTV3Client implements MqttCallbackExtended {
 
-	private final String serverURI;
 	private MqttClient client;
-	private final MqttConnectOptions mqttOptions;
-
-	public ClientMQTT(String serverURI, String usuario, String senha) {
-		this.serverURI = serverURI;
-
-		mqttOptions = new MqttConnectOptions();
-		mqttOptions.setMaxInflight(200);
-		mqttOptions.setConnectionTimeout(3);
-		mqttOptions.setKeepAliveInterval(10);
-		mqttOptions.setAutomaticReconnect(true);
-		mqttOptions.setCleanSession(false);
-
-		if (usuario != null && senha != null) {
-			mqttOptions.setUserName(usuario);
-			mqttOptions.setPassword(senha.toCharArray());
+	
+	public MQTTV3Client(String brokerURI, MqttSign sign) {
+		try {
+			System.out.println("Connecting the broker MQTT at " + brokerURI);
+			client = new MqttClient(brokerURI, sign.getClientid(),
+					new MqttDefaultFilePersistence(System.getProperty("java.io.tmpdir")));
+			client.setCallback(this);
+			
+			MqttConnectOptions  mqttOptions = new MqttConnectOptions();
+			mqttOptions.setCleanSession(true);
+			mqttOptions.setKeepAliveInterval(180);
+			mqttOptions.setUserName(sign.getUsername());
+			mqttOptions.setPassword(sign.getPassword().toCharArray());
+			mqttOptions.setMaxInflight(200);
+			mqttOptions.setConnectionTimeout(3);
+			mqttOptions.setAutomaticReconnect(true);
+			client.connect(mqttOptions);
+            System.out.println("broker: " + brokerURI + " Connected");
+		} catch (MqttException ex) {
+			System.out.println("Error connecting to broker mqtt " + brokerURI + " - " + ex);
 		}
 	}
+	
 
 	public IMqttToken subscribe(int qos, IMqttMessageListener gestorMensagemMQTT, String... topicos) {
-		if (client == null || topicos.length == 0) {
-			return null;
-		}
 		int tamanho = topicos.length;
 		int[] qoss = new int[tamanho];
 		IMqttMessageListener[] listners = new IMqttMessageListener[tamanho];
@@ -64,17 +66,7 @@ public class ClientMQTT implements MqttCallbackExtended {
 		}
 	}
 
-	public void start(String clientID) {
-		try {
-			System.out.println("Connecting the broker MQTT at " + serverURI);
-			client = new MqttClient(serverURI, clientID,
-					new MqttDefaultFilePersistence(System.getProperty("java.io.tmpdir")));
-			client.setCallback(this);
-			client.connect(mqttOptions);
-		} catch (MqttException ex) {
-			System.out.println("Error connecting to broker mqtt " + serverURI + " - " + ex);
-		}
-	}
+	
 
 	public void end() {
 		if (client == null || !client.isConnected()) {
