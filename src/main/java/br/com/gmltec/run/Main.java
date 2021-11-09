@@ -1,6 +1,5 @@
 package br.com.gmltec.run;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import br.com.gmltec.sensor.Sensor;
