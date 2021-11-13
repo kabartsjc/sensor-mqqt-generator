@@ -10,46 +10,18 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import br.com.gmltec.geo.Coordinate;
+import br.com.gmltec.sensor.ISensor;
 import br.com.gmltec.sensor.Sensor;
 
 public class ConfigUtils {
 	
-	public static List<Sensor> parseConfigFiles() {
-		System.out.println("parsing basic config.json");
-		String params [] = parseConfig();
-		System.out.println("parsing basic sensors.json");
-		List<Sensor>sensorL = parseSensorFiles(params);
-		return sensorL;
-	}
-	
-	private static String[] parseConfig() {
-		String exeFile = "resources/config.json";
-		String qos=null;
-		String mqqtBrokerAddr=null;
-		
-		try {
-			Object obj = new JSONParser().parse(new FileReader(exeFile));
-			JSONObject jo = (JSONObject) obj;
-			mqqtBrokerAddr = (String) jo.get("mqqtBrokerAddr");	
-			qos =  (String) jo.get("qos");	
-		} catch (IOException | ParseException e) {
-			e.printStackTrace();
-		}
-		
-		String[] obj = new String[3];
-		obj[0]=mqqtBrokerAddr;
-		obj[1]=qos;
-		
-		return obj;
-	}
 	
 	
-	private static List<Sensor> parseSensorFiles(String params[]) {
-		String sensorFile = "resources/sensors.json";
+	public static List<Sensor> parseSensorFiles(String filePath) {
+		String sensorFile = filePath;
 		List<Sensor> sensorL = new ArrayList<>();
 		
-		String mqqtBrokerAddr=params[0];
-		int qos=Integer.parseInt(params[1]);
 		
 		try {
 			Object obj = new JSONParser().parse(new FileReader(sensorFile));
@@ -61,15 +33,28 @@ public class ConfigUtils {
 				
 				String sensorID = (String) jo.get("sensorID");
 				double latitude = (double) jo.get("latitude");
-				double longitude = (double) jo.get("longitude");
-				int update_rate_ms= Integer.parseInt((String) jo.get("update_rate_ms"));
+				double longitude = (double) jo.get("longitude"); 
+				Coordinate coord = new Coordinate(latitude, longitude, 0);
+				
+				int update_rate_ms= ((Long)jo.get("update_rate_ms")).intValue();
 				double mean=(double) jo.get("mean");
 				double stdv=(double) jo.get("stdv");
 				String mqqtTopic = (String) jo.get("mqqtTopic");
+				int qos=(int) ((Long)jo.get("qos")).intValue();
+				String sensorType= (String) jo.get("sensor_type");
+				String mqqtBrokerAddr = (String) jo.get("brokerAddr");
 				
-				Sensor sensor = new Sensor(productKey,deviceSecret,sensorID, mqqtTopic, mqqtBrokerAddr,
-						qos,update_rate_ms,
-						latitude, longitude, mean, stdv);
+				ISensor.SENSOR_TYPE type = null;
+				if (sensorType.equals("ULTRASONIC")) 
+					type = ISensor.SENSOR_TYPE.ULTRASONIC;
+				else if (sensorType.equals("TEMPERATURE"))
+					type = ISensor.SENSOR_TYPE.TEMPERATURE;
+				else if (sensorType.equals("SMOKE"))
+					type = ISensor.SENSOR_TYPE.SMOKE;
+				
+				Sensor sensor = new Sensor (sensorID,type, mqqtBrokerAddr,mqqtTopic, qos,update_rate_ms, 
+						coord,mean, stdv, deviceSecret, productKey);
+				
 				sensorL.add(sensor);
 			}
 		} catch (IOException | ParseException e) {

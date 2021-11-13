@@ -6,25 +6,111 @@
 	<artifactId>sensor-mqqt-sim-generator</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>Sensor Mqqt Sim Generator</name>
-	<build>
-		<sourceDirectory>src/main/java</sourceDirectory>
-		<plugins>
-			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.8.1</version>
-				<configuration>
-					<release>15</release>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
 
+	<packaging>jar</packaging>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.target>15</maven.compiler.target>
 		<maven.compiler.source>15</maven.compiler.source>
+		<jdk.version>15</jdk.version>
+
 	</properties>
 
+
+	<build>
+		<finalName>sensor-mqqt-sim-generator_V2</finalName>
+		<plugins>
+
+			<!-- download source code in Eclipse, best practice -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-eclipse-plugin</artifactId>
+				<version>2.9</version>
+				<configuration>
+					<downloadSources>true</downloadSources>
+					<downloadJavadocs>false</downloadJavadocs>
+				</configuration>
+			</plugin>
+
+			<!-- Set a compiler level -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.3.2</version>
+				<configuration>
+					<source>${jdk.version}</source>
+					<target>${jdk.version}</target>
+				</configuration>
+			</plugin>
+
+			<!-- Make this jar executable -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+				  <excludes>
+					<exclude>**/log4j.properties</exclude>
+				  </excludes>
+				  <archive>
+				    <manifest>
+					<addClasspath>true</addClasspath>
+					<mainClass>br.com.gmltec.run.SimuRun</mainClass>
+					<classpathPrefix>dependency-jars/</classpathPrefix>
+				    </manifest>
+				  </archive>
+				</configuration>
+			</plugin>
+
+			<!-- Copy project dependency -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>2.5.1</version>
+				<executions>
+				  <execution>
+					<id>copy-dependencies</id>
+					<phase>package</phase>
+					<goals>
+						<goal>copy-dependencies</goal>
+					</goals>
+					<configuration>
+					  <!-- exclude junit, we need runtime dependency only -->
+					  <includeScope>runtime</includeScope>
+					  <outputDirectory>${project.build.directory}/dependency-jars/</outputDirectory>
+					</configuration>
+				  </execution>
+				</executions>
+			</plugin>
+
+		</plugins>
+	</build>
+
+
+
+	<repositories>
+		<repository>
+			<id>osgeo</id>
+			<name>OSGeo Release Repository</name>
+			<url>https://repo.osgeo.org/repository/release/</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+		</repository>
+		<repository>
+			<id>osgeo-snapshot</id>
+			<name>OSGeo Snapshot Repository</name>
+			<url>https://repo.osgeo.org/repository/snapshot/</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+		</repository>
+	</repositories>
 	<dependencies>
 		<!-- https://mvnrepository.com/artifact/org.eclipse.paho/org.eclipse.paho.client.mqttv3 -->
 		<dependency>
@@ -39,7 +125,7 @@
 			<version>1.2.2a</version>
 		</dependency>
 
-		
+
 
 		<!-- https://mvnrepository.com/artifact/com.googlecode.json-simple/json-simple -->
 		<dependency>
@@ -47,6 +133,24 @@
 			<artifactId>json-simple</artifactId>
 			<version>1.1</version>
 		</dependency>
+
+		<dependency>
+			<groupId>org.beryx</groupId>
+			<artifactId>text-io</artifactId>
+			<version>3.4.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>io.ratpack</groupId>
+			<artifactId>ratpack-core</artifactId>
+			<version>1.5.1</version>
+		</dependency>
+		<dependency>
+			<groupId>io.ratpack</groupId>
+			<artifactId>ratpack-session</artifactId>
+			<version>1.5.1</version>
+		</dependency>
+
 
 
 	</dependencies>

@@ -1,91 +1,110 @@
 package br.com.gmltec.sensor;
 
-import java.text.SimpleDateFormat;
-
-import org.eclipse.paho.client.mqttv3.IMqttToken;
-
-import br.com.gmltec.gen.RandomGen;
-import br.com.gmltec.mqqt.MQTTV3Client;
-import br.com.gmltec.mqqt.Mqtt3PostPropertyMessageListener;
+import br.com.gmltec.geo.Coordinate;
 import br.com.gmltec.mqqt.MqttSign;
+import br.com.gmltec.scenario.RandomGen;
 
 
-public class Sensor implements Runnable {
-	private String sensorID;
-	private double latitude;
-	private double longitude;
-
-	private MQTTV3Client clientMQTT;
-	private MqttSign sign;
-
-	private String mqqtTopic;
+public class Sensor extends ISensor{
 	
-	private int update_rate_ms;
-	
-	private RandomGen random;
-	
-	private boolean running=true;
-	
-	public Sensor(String productKey, String deviceSecret, String sensorID, 
-			String mqqtTopic, String mqqtBrokerAddr, int qos,int update_rate_ms,
-			double latitude, double longitude, double mean, double stdv) {
-		super();
+	public Sensor (String sensorID,SENSOR_TYPE  type, String mqqtBrokerAddr,int qos,int update_rate_ms, 
+			Coordinate coord,double max_value, double min_value) {
 		
-		sign = new MqttSign();
-        sign.calculate(productKey, sensorID, deviceSecret);
-        
 		this.sensorID = sensorID;
-		this.mqqtTopic=mqqtTopic;
-		this.latitude = latitude;
-		this.longitude = longitude;
-		random = new RandomGen(mean, stdv);
+		this.type=type;
+		if (type == SENSOR_TYPE.ULTRASONIC)
+			this.mqqtTopic="ultrasom";
+		else if (type == SENSOR_TYPE.TEMPERATURE)
+			this.mqqtTopic="temperature";
+		else 
+			return;
 		
 		this.update_rate_ms=update_rate_ms;
 		
-		clientMQTT = new MQTTV3Client(mqqtBrokerAddr, sign);
+		this.qos=qos;
+		this.mqqtBrokerAddr=mqqtBrokerAddr;
 		
-		IMqttToken subscribe = clientMQTT.subscribe(qos,  new Mqtt3PostPropertyMessageListener(), mqqtTopic);
-		if (subscribe==null) {
+		
+		mean = (max_value+ min_value)/2;
+		stdv = RandomGen.generateDouble(max_value, min_value);
+		 
+		sign = new MqttSign();
+        sign.calculate(productKey, sensorID, deviceSecret);
+        
+        this.coord=coord;
+		
+        random = new RandomGen(mean, stdv);
+		productKey = RandomGen.generateRandomString(7);
+		deviceSecret = RandomGen.generateRandomString(7);
+		 
+	}
+	
+	public Sensor (String sensorID,SENSOR_TYPE  type, String mqqtBrokerAddr,
+			int qos,int update_rate_ms, Coordinate coord) {
+		
+		this.sensorID = sensorID;
+		this.type=type;
+		
+		this.coord=coord;
+		
+		this.qos=qos;
+		this.mqqtBrokerAddr=mqqtBrokerAddr;
+		
+		if (type == SENSOR_TYPE.HUMIDIT)
+			this.mqqtTopic="humidit";
+		else if (type == SENSOR_TYPE.SMOKE)
+			this.mqqtTopic="smoke";
+		else 
 			return;
-		}
-	}
-
-	private String prepareMessage() {
-		String msg = null;
-		String time = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(System.currentTimeMillis());
-		String measure = Double.toString(random.nextSample());
-		msg="nodeID="+sensorID+";time="+time+";measure="+measure+";coordinate="+Double.toString(latitude)+":"+Double.toString(longitude);
-		return msg;
-	}
-	
-	
-	private void publish() {
-		String msg = prepareMessage();
-		clientMQTT.publish(mqqtTopic, msg.getBytes(), 0);
-	}
-	
-	
-	private void close() {
-		clientMQTT.unsubscribe(mqqtTopic);
-		clientMQTT.end();
-	}
-	
-	@Override
-	public void run() {
 		
-		while(running) {
-			try {
-				this.publish();
-				Thread.sleep(this.update_rate_ms);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
+		this.update_rate_ms=update_rate_ms;
 		
-		this.close();
+		productKey = RandomGen.generateRandomString(7);
+		
+		deviceSecret = RandomGen.generateRandomString(7);
+		
+		mean = 0.5;
+		stdv = RandomGen.generateDouble(0.5, 0.2);
+		 
+		sign = new MqttSign();
+        sign.calculate(productKey, sensorID, deviceSecret);
+		
+        random = new RandomGen(mean, stdv);
+		
+       
 	}
 	
-	public void finish() {
-		this.running=false;
+	
+	public Sensor (String sensorID,SENSOR_TYPE  type, String mqqtBrokerAddr,String mqqtTopic, int qos,int update_rate_ms, 
+			Coordinate coord,double mean, double stvd, String deviceSecret, String productKey) {
+		
+		this.sensorID = sensorID;
+		this.type=type;
+		this.mqqtTopic=sensorID+"/"+mqqtTopic;
+		
+		this.update_rate_ms=update_rate_ms;
+		
+		this.qos=qos;
+		this.mqqtBrokerAddr=mqqtBrokerAddr;
+		
+		this.productKey = productKey;
+		this.deviceSecret = deviceSecret;
+		 
+		this.mean = mean;
+		this.stdv =stvd;
+		 
+		sign = new MqttSign();
+        sign.calculate(productKey, sensorID, deviceSecret);
+        
+        this.coord=coord;
+		
+        random = new RandomGen(mean, stdv);
+		
+       
 	}
+	
+	
+	
+	
+	
 }

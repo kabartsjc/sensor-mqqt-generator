@@ -5,3 +5,5 @@
 target/classes/META-INF/MANIFEST.MF
 target/classes/META-INF/maven/br.com.gmltec/sensor-mqqt-sim-generator/pom.properties
 target/classes/META-INF/maven/br.com.gmltec/sensor-mqqt-sim-generator/pom.xml
+/target/
+.settings/org.eclipse.core.resources.prefs
