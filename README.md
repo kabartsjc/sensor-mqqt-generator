@@ -1,8 +1,6 @@
 # sensor-mqqt-generator (V2)
 
-![Isso é uma imagem](resources/log.png)
-
-
+![Logo](resources/log2.png)
 
 The project <b> sensor-mqqt-generator </b> is a Java project which aims to simulate a vast sensor network that communicates with a Broker using MQQT messages. Unfortunately, the current implementation does not support security schema like TLS/SSL connections.
 
@@ -35,30 +33,72 @@ The MQQT protocol has these main features:
     - How To Create and Run Maven Project with Eclipse and CommandLine: https://www.youtube.com/watch?v=HmF3yQ_nj5Q
     - How To use Eclipse: https://www.youtube.com/watch?v=H35w2V2V-Nk
 
-# Run the simulation
-**Start the Simulation**
+# Start the Simulation
 Inside the target folder (created by the compilation process), run following command: **_java -jar sensor-mqqt-sim-generator_V2.jar_**.
+![Main Screen](fig/fig1.png)
+
+# Creation of Scenario
+- Select the option **_C_**.
+- Define the broker address
+- Define a default qos value (this value will be used by all nodes in your experiment).
+- Define a **full path** (folder) to save the simulation file (remember to set the correct delimitator based on your operating system)
+    - _Remember the path needs to exist!_  
+- Define the name of the simulation file (just the name and remember to save as a json file)
+- Check the information and confirm (**_Y_**)
+
+![Main Screen](fig/fig2.png)
+
+**_Configuration of Ultrasonic Sensors Experiment_**
+- Define the number of ultrasonic sensors that you want to simulate
+    - _If you define 0 or a negative number, your experiment does not have any ultrasonic sensors!_  
+- Define the max  distance measure (cm) read by the sensor.
+    - _For example, in the project, if you want to simulate a trash can that has 90 cm of height, the maximum distance is 90!_  
+- Define the minimum distance measure (cm) read by the sensor.
+- Define the update rate in microseconds (ms): it defines the period your sensor will send updates to the broker.
+- Check the information and confirm (**_Y_**)
+
+![Configuration of Ultrasonic Sensors](fig/fig3.png)
 
 
+**_Configuration of Temperature Sensors Experiment_**
+- Define the number of temperature sensors that you want to simulate
+    - _If you define 0 or a negative number, your experiment does not have any temperature sensors!_  
+- Define the max temperature measure read by the sensor.
+- Define the min temperature measure read by the sensor.
+- Define the update rate in microseconds (ms): it defines the period your sensor will send updates to the broker.
+- Check the information and confirm (**_Y_**)
+
+**_Configuration of Smoke Detector Sensors Experiment_**
+- Define the number of smoke detector sensors that you want to simulate
+    - _If you define 0 or a negative number, your experiment does not have any smoke detector sensors!_  
+- Define the update rate in microseconds (ms): it defines the period your sensor will send updates to the broker.
+- - Check the information and confirm (**_Y_**)
+
+![Configuration of Smoke Detector Sensors](fig/fig4.png)
+
+**_Configuration of Rain / Humidity Detector Sensors Experiment_**
+- Define the number of rain / humidity detector sensors that you want to simulate
+    - _If you define 0 or a negative number, your experiment does not have any rain / humidity detector sensors!_  
+- Define the update rate in microseconds (ms): it defines the period your sensor will send updates to the broker.
+- Check the information and confirm (**_Y_**)
 
 
-# The General Architecture
+**_Configuration the sensors place_**
+- Define the latitude of the central point of devices
+- Define the longitude of the central point of devices
+- Define the maximum distance (meters) where a sensor can be than the central point
+    - _The simulator will generate randomly the simulate devices using the central point and the maximum range to define its position!_
+    - _To define this parameters, consider the below Figure (based on the Google Maps). It represents the Santa Fe campus of Tecnologico de Monterrey. You can use Google Maps to discovery the coordinates of the central point.   
+- - Check the information and confirm (**_Y_**)
 
-The main class is the Sensor, which simulates an actual device in an MQQT network. The configuration of this is made by the sensors.json file, located in the resources folder. This file needs to describe the basic information about the sensor. 
--	"productKey": it is a unique key for each device based on the product brand. The current version does not use this field; however, you need to set it.
--	"deviceSecret": it is the secret for the device based on the product brand. The current version does not use this field; however, you need to set it.
--	"sensorID": it is the id of the sensor. This information needs to be a unique value in the sensor network.
--	"latitude": it is the latitude where the sensor is, using a double representation of it.
--	"longitude": it is the longitude where the sensor is, using a double representation of it.
--	"update_rate_ms": this value is the interval of time that the sensor will publish its information and send it to the Broker.
--	"mean": sets the average of the magnitude measured by the sensor (average between the minimum and maximum value). The current implementation has only the Gaussian distribution; however, there are plans to have other distributions to define the data samples in the future.
--	"mqqtTopic": defines the topic of the information published, for example: "sensors/moscatest." Unfortunately, the current implementation supports only one topic for the device.
--	"stdv": it is the standard deviation of the measures of the sensor. The current implementation has only the gaussian distribution. However, there are plans to in the future have other distributions to define the data samples.
+![Define the Central Point](fig/fig5.png)
 
-There is another important file that is required for the Sensor class - the config.json. This file has three variables:
--	"mqqtBrokerAddr": It represents the address of broker, for example: "tcp://127.0.0.1:1883",
--	"qos": it is the level of the agreement between the sender of a message and the receiver of a message that defines the guarantee of delivery for a specific message.  The value can be “0”, “1”, or “2”.
 
-# Running an experiment
+# Run a Created Experiment
+- Select the option **_R_**.
+- Define a **full path** (folder and file) where the simulation file is persisted (remember to set the correct delimitator based on your operating system)
+- Define the amount of time (**minute**) that you desire to your experiment.
+- Check the information and confirm (**_Y_**)
 
-To run the simulator, you need to call the class SimuRun and pass (as a parameter) the number of minutes you want that simulation to run.
+![Define the Central Point](fig/fig6.png)
+
