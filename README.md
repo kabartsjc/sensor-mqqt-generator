@@ -1,6 +1,17 @@
-# sensor-mqqt-generator
+# sensor-mqqt-generator (V2)
+
+![Isso é uma imagem](resources/log.png)
+
+
 
 The project <b> sensor-mqqt-generator </b> is a Java project which aims to simulate a vast sensor network that communicates with a Broker using MQQT messages. Unfortunately, the current implementation does not support security schema like TLS/SSL connections.
+
+The second version has multiple changes:
+- A new iterative shell menu to simplify the scenario development;
+- A simplistic script to generate the jar files and its dependences (using maven)
+- Support to multiple IoT devices (temperature, ultrasonic, smoke detection, and humidity and water detection).
+
+**The files generated in the oldest version (v 1.0) are not supported by this new version (v 2.0).**
 
 <b>MQTT (MQ Telemetry Transport)</b> is a lightweight messaging protocol designed for high-latency, low-bandwidth, and unreliable networks. It consumes very little power on the device it’s running on, and it works well over unreliable networks.
 
@@ -9,9 +20,27 @@ The MQQT protocol has these main features:
 -	Persistent Sessions
 -	Last Will: A "last will" message is automatically sent to the MQTT broker if the client ungracefully disconnects. This allows the broker to notify the other clients easily and efficiently when one disconnects.
 
-# Installation Process:
+# Compilation Process and JAR file Generation
 
-The installation process is quite simple, as the project uses Maven. Special attention is related to the use of Java 15 during the performance tests. The easiest way to run the project is using the Eclipse IDE.
+**Basic Directions**
+- The compilation of process is quite simple, as the project uses Maven.
+- The requirement to the simulation compilation is the **Java 15**.
+- The easiest way to compile the project is using the Eclipse IDE.
+
+**Compilation Instructions**
+- Go to the root folder (**folder wich contains pom.xml**)
+-  run the maven package command:**_mvn package_** 
+- if the compilation process worked, a new folder (target) is created with the jar file and a group of folders (ex.: dependency-jars).
+- if the compilation process did not work, compile using Eclipse; please visit:
+    - How To Create and Run Maven Project with Eclipse and CommandLine: https://www.youtube.com/watch?v=HmF3yQ_nj5Q
+    - How To use Eclipse: https://www.youtube.com/watch?v=H35w2V2V-Nk
+
+# Run the simulation
+**Start the Simulation**
+Inside the target folder (created by the compilation process), run following command: **_java -jar sensor-mqqt-sim-generator_V2.jar_**.
+
+
+
 
 # The General Architecture
 
