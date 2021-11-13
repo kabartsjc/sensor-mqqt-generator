@@ -11,6 +11,10 @@ The second version has multiple changes:
 
 **The files generated in the oldest version (v 1.0) are not supported by this new version (v 2.0).**
 
+**Binary (tested on Windows):** https://github.com/kabartsjc/sensor-mqqt-generator/releases/download/v2.0/sensor-mqqt-sim-generator_V2.zip
+- if you want to run in another operating system, it is possible to required to compile in your specific operating sysyem and adjust the source code.
+
+
 <b>MQTT (MQ Telemetry Transport)</b> is a lightweight messaging protocol designed for high-latency, low-bandwidth, and unreliable networks. It consumes very little power on the device it’s running on, and it works well over unreliable networks.
 
 The MQQT protocol has these main features:
