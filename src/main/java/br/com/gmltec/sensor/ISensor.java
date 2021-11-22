@@ -21,6 +21,8 @@ public abstract class ISensor implements Runnable {
 
 	protected String productKey;
 	protected String deviceSecret;
+	
+	protected boolean azureSupport;
 
 	protected MQTTV3Client clientMQTT;
 	protected MqttSign sign;
@@ -97,6 +99,10 @@ public abstract class ISensor implements Runnable {
 
 	public String getMqqtTopic() {
 		return mqqtTopic;
+	}
+	
+	public boolean getAzureSupport() {
+		return azureSupport;
 	}
 
 	public SENSOR_TYPE getType() {

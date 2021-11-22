@@ -1,0 +1,47 @@
+[
+	{
+		"stdv": 10.259633451008302,
+		"mqqtTopic": "ultrasom",
+		"latitude": -23.2,
+		"productKey": "8yunabs",
+		"sensor_type": "ULTRASONIC",
+		"sensorID": "1",
+		"deviceSecret": "akajhs192829",
+		"qos": 0,
+		"azure_support": "true",
+		"mean": 20.0,
+		"brokerAddr": "127.0.0.1:1883",
+		"update_rate_ms": 3000,
+		"longitude": -43.2
+	},
+	{
+		"stdv": 15.627698781364817,
+		"mqqtTopic": "ultrasom",
+		"latitude": -21.3,
+		"productKey": "a1WSvyb",
+		"sensor_type": "ULTRASONIC",
+		"sensorID": "2",
+		"deviceSecret": "2ujwuwujw2773",
+		"qos": 0,
+		"azure_support": "true",
+		"mean": 20.0,
+		"brokerAddr": "127.0.0.1:1883",
+		"update_rate_ms": 3000,
+		"longitude": -43.23
+	},
+	{
+		"stdv": 68.34903322965378,
+		"mqqtTopic": "temperature",
+		"latitude": -45.3,
+		"productKey": "OccsLAt",
+		"sensor_type": "TEMPERATURE",
+		"sensorID": "3",
+		"deviceSecret": "skjskjk92",
+		"qos": 0,
+		"azure_support": "true",
+		"mean": 35.0,
+		"brokerAddr": "127.0.0.1:1883",
+		"update_rate_ms": 3000,
+		"longitude": -122.3
+	}
+]
